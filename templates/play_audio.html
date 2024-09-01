@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Audio</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Play Audio</h1>
+        <audio id="converted-audio" controls>
+            <source id="audio-source" src="{{ audio_filename }}" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+        <br>
+        <button id="play-button" class="btn btn-primary">Play</button>
+        <button id="pause-button" class="btn btn-primary">Pause</button>
+        <script>
+            function playAudio() {
+                var audio = document.getElementById("converted-audio");
+                audio.play();
+            }
+
+            function pauseAudio() {
+                var audio = document.getElementById("converted-audio");
+                audio.pause();
+            }
+
+            $(document).ready(function() {
+                $("#play-button").click(function() {
+                    playAudio();
+                });
+
+                $("#pause-button").click(function() {
+                    pauseAudio();
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

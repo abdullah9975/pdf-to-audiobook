@@ -1,0 +1,111 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>PDF to Speech Converter</title>-->
+<!--    &lt;!&ndash; Bootstrap CSS &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
+<!--</head>-->
+<!--<body>-->
+<!--    <div class="container mt-5">-->
+<!--        <h1 class="mb-4">PDF to Speech Converter</h1>-->
+<!--        <form action="/upload" method="post" enctype="multipart/form-data">-->
+<!--            <div class="form-group">-->
+<!--                <label for="pdfFile">Select PDF File:</label>-->
+<!--                <input type="file" class="form-control-file" id="pdfFile" name="file" accept=".pdf" multiple>-->
+<!--            </div>-->
+<!--            <button type="submit" class="btn btn-primary">Upload PDF</button>-->
+<!--        </form>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Bootstrap JS &ndash;&gt;-->
+<!--    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>-->
+<!--    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Speech Converter</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">PDF to Speech Converter</h1>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message[1] }} alert-dismissible fade show" role="alert">
+                        {{ message[0] }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+            <div class="form-group">
+                <label for="pdfFile">Select PDF File:</label>
+                <input type="file" class="form-control-file" id="pdfFile" name="file" accept=".pdf" multiple>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload PDF</button>
+        </form>
+        <div class="progress mt-4" id="progressBar" style="display: none;">
+            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Function to update the progress bar
+        function updateProgressBar(progress) {
+            var progressBar = document.getElementById('progressBar');
+            progressBar.style.display = 'block';
+            var progressBarInner = progressBar.querySelector('.progress-bar');
+            progressBarInner.style.width = progress + '%';
+            progressBarInner.textContent = progress + '%';
+        }
+
+        // Function to fetch the progress from the server
+        function fetchProgress() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/status?audio_file=' + audioFile, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var downloadStatus = JSON.parse(xhr.responseText);
+                    if (downloadStatus.status === 'downloading') {
+                        updateProgressBar(downloadStatus.progress);
+                        setTimeout(fetchProgress, 1000); // Fetch progress every second
+                    } else if (downloadStatus.status === 'completed') {
+                        // Handle download completion
+                        var progressBar = document.getElementById('progressBar');
+                        progressBar.style.display = 'none';
+                        // Show a success message or download link
+                    } else if (downloadStatus.status === 'failed') {
+                        // Handle download failure
+                        // Show an error message
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        // Fetch progress when the page is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchProgress();
+        });
+    </script>
+</body>
+</html>
+
+
